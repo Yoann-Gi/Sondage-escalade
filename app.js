@@ -213,14 +213,11 @@ window.addEventListener("click", (e) => {
 // ==========================================
 
 function chargerVotesUtilisateur() {
-    const selectName = document.getElementById("participant-name").value;
-    const textName = document.getElementById("participant-name-text").value.trim();
-    
-    // Priorité au nom tapé à la main, sinon on prend le menu déroulant
-    const nomSaisi = textName || selectName;
+    // Récupération directe sur le champ unique
+    const nomSaisi = document.getElementById("participant-name").value.trim();
 
     if (!nomSaisi) {
-        alert("Veuillez d'abord choisir un nom dans la liste ou en taper un nouveau.");
+        alert("Veuillez d'abord saisir ou sélectionner un nom.");
         return;
     }
 
