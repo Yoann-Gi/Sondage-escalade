@@ -102,7 +102,6 @@ function renderApp() {
     if (!table || !checkboxGroup || !datalist) return;
 
     // Met à jour la liste de suggestions du champ unique
-    const datalist = document.getElementById("participants-list");
     if (datalist) {
         datalist.innerHTML = pollData.participants.map(p => `<option value="${p.name}"></option>`).join('');
     }
