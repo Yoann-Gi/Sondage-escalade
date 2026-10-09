@@ -2,11 +2,11 @@
 // PARTIE 1 : CONFIGURATION ET CONNEXION
 // ==========================================
 
-const SUPABASE_URL = "https://supabase.co"; 
+const SUPABASE_URL = "https://psywexejmesddospqfuj.supabase.co"; 
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzeXdleGVqbWVzZGRvc3BxZnVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc5NjUzNjMsImV4cCI6MjA0MzU0MTM2M30.q43Y9H-A2_fGjC0347_z3_86_z3_86_z3_86_z3_86_z3_86"; 
 
-// Initialisation via la fenêtre globale du navigateur pour valider le script CDN
-const maBaseDeDonnees = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Appel standardisé pour le script unpkg
+const maBaseDeDonnees = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const VACANCES_ZONE_A_2026_2027 = [
     { debut: new Date('2026-10-24'), fin: new Date('2026-11-09') }, // Toussaint
