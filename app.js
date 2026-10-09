@@ -1,6 +1,14 @@
 // ==========================================
-// PARTIE 1 : CONFIGURATION ET LOGIQUE DES DONNÉES
+// PARTIE 1 : CONNEXION ET MODULE SUPABASE
 // ==========================================
+
+// Votre URL est déjà configurée ici
+const SUPABASE_URL = "https://psywexejmesddospqfuj.supabase.co"; 
+// Collez votre longue clé "anon / public" entre les guillemets ci-dessous :
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzeXdleGVqbWVzZGRvc3BxZnVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1Njg3OTQsImV4cCI6MjEwNzE0NDc5NH0.VjLnMhX0kbAnx1F0Rdy6bzMKJjLQBS5FWTwSuZIy81M";
+
+// Initialisation officielle du client Supabase
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const VACANCES_ZONE_A_2026_2027 = [
     { debut: new Date('2026-10-24'), fin: new Date('2026-11-09') }, // Toussaint
@@ -18,6 +26,9 @@ let pollData = {
     propositions: [], 
     participants: []  
 };
+// ==========================================
+// PARTIE 2 : GÉNÉRATEUR ET SYNCHRONISATION
+// ==========================================
 
 function genererPropositions() {
     const propositions = [];
@@ -51,28 +62,42 @@ function genererPropositions() {
     return propositions;
 }
 
-function chargerDonnees() {
-    const donneesSauvegardees = localStorage.getItem('sondage_escalade_data');
-    if (donneesSauvegardees) {
-        pollData = JSON.parse(donneesSauvegardees);
-        pollData.title = "Encadrement des séances enfants";
-    } 
+// Charger les données depuis Supabase à l'ouverture
+async function chargerDonnees() {
     pollData.propositions = genererPropositions();
-    sauvegarderDonnees();
+    
+    const { data, error } = await supabase
+        .from('participants')
+        .select('name, votes');
+
+    if (error) {
+        console.error("Erreur de chargement Supabase:", error);
+    } else if (data) {
+        pollData.participants = data;
+    }
+    renderApp();
 }
 
-function sauvegarderDonnees() {
-    localStorage.setItem('sondage_escalade_data', JSON.stringify(pollData));
+// Écouter les changements en temps réel (Julie voit le vote de Thomas en direct)
+function brancherTempsReel() {
+    supabase
+        .channel('schema-db-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'participants' }, () => {
+            chargerDonnees();
+        })
+        .subscribe();
 }
 
 function réinitialiserBoutonCharger() {
     const btnLoad = document.getElementById("btn-load");
-    btnLoad.disabled = false;
-    btnLoad.style.backgroundColor = "var(--primary-color)";
-    btnLoad.style.cursor = "pointer";
+    if (btnLoad) {
+        btnLoad.disabled = false;
+        btnLoad.style.backgroundColor = "var(--primary-color)";
+        btnLoad.style.cursor = "pointer";
+    }
 }
 // ==========================================
-// PARTIE 2 : LOGIQUE D'AFFICHAGE ET ÉVÉNEMENTS
+// PARTIE 3 : LOGIQUE DE RENDU GRAPHIQUE
 // ==========================================
 
 function renderApp() {
@@ -80,8 +105,12 @@ function renderApp() {
     const checkboxGroup = document.getElementById("propositions-checkboxes");
     const datalist = document.getElementById("participants-list");
 
+    if (!table || !checkboxGroup || !datalist) return;
+
+    // Remplir le volet déroulant automatique des profils existants
     datalist.innerHTML = pollData.participants.map(p => `<option value="${p.name}"></option>`).join('');
 
+    // Compter et regrouper les prénoms par créneau
     const listeInscritsParProp = {};
     pollData.propositions.forEach(p => listeInscritsParProp[p.id] = []);
     
@@ -93,6 +122,7 @@ function renderApp() {
         }
     });
 
+    // --- Dessiner le Tableau des Résultats ---
     let tableHTML = `
         <thead>
             <tr>
@@ -132,6 +162,7 @@ function renderApp() {
     tableHTML += `</tbody>`;
     table.innerHTML = tableHTML;
 
+    // Activer l'affichage de la liste des prénoms au clic sur un badge
     document.querySelectorAll('.badge').forEach(badge => {
         badge.addEventListener('click', function() {
             const propId = this.getAttribute('data-id');
@@ -142,6 +173,7 @@ function renderApp() {
         });
     });
 
+    // --- Dessiner le Formulaire de Vote (cases à cocher) ---
     let formHTML = `<p class="info-loi">Sélectionnez vos créneaux (Déroulez la liste) :</p>
                     <div class="select-scroll-container">`;
     
@@ -184,7 +216,7 @@ window.addEventListener("click", (e) => {
     }
 });
 // ==========================================
-// PARTIE 3 : SAISIE, CHARGEMENT DU PROFIL ET SOUFFLET
+// PARTIE 4 : ACTIONS FORMULAIRE ET CORPS GLOBAL
 // ==========================================
 
 function chargerVotesUtilisateur() {
@@ -212,24 +244,28 @@ function chargerVotesUtilisateur() {
         alert(`Nouveau profil créé pour "${nomSaisi}". Vous pouvez maintenant choisir vos créneaux.`);
     }
 
-    optionsBlock.classList.add("visible");
+    if (optionsBlock) optionsBlock.classList.add("visible");
 
-    // VERROUILLAGE ET COULEUR GRISE DU BOUTON CHARGER
-    btnLoad.disabled = true;
-    btnLoad.style.backgroundColor = "#bdc3c7"; 
-    btnLoad.style.cursor = "not-allowed";
+    // Bloquer le bouton charger en gris
+    if (btnLoad) {
+        btnLoad.disabled = true;
+        btnLoad.style.backgroundColor = "#bdc3c7"; 
+        btnLoad.style.cursor = "not-allowed";
+    }
 }
 
 document.getElementById("btn-load").addEventListener("click", chargerVotesUtilisateur);
 
 document.getElementById("participant-name").addEventListener("input", function() {
     if (this.value.trim() === "") {
-        document.getElementById("vote-options-block").classList.remove("visible");
+        const optionsBlock = document.getElementById("vote-options-block");
+        if (optionsBlock) optionsBlock.classList.remove("visible");
     }
     réinitialiserBoutonCharger();
 });
 
-document.getElementById("vote-form").addEventListener("submit", function(e) {
+// Envoi et sauvegarde des votes sur les serveurs de Supabase
+document.getElementById("vote-form").addEventListener("submit", async function(e) {
     e.preventDefault();
     const nomParticipant = document.getElementById("participant-name").value.trim();
     if (!nomParticipant) return;
@@ -246,32 +282,32 @@ document.getElementById("vote-form").addEventListener("submit", function(e) {
         votesParticipant[cb.value] = cb.checked;
     });
 
-    const indexExistant = pollData.participants.findIndex(p => p.name.toLowerCase() === nomParticipant.toLowerCase());
-    
-    if (indexExistant !== -1) {
-        pollData.participants[indexExistant].votes = votesParticipant;
-        alert(`Vos modifications ont bien été enregistrées, ${nomParticipant} !`);
-    } else {
-        pollData.participants.push({
-            name: nomParticipant,
-            votes: votesParticipant
-        });
-        alert(`Bienvenue, vos choix ont été pris en compte !`);
-    }
+    // Envoi à Supabase (si le nom existe, il met à jour, sinon il insère une nouvelle ligne)
+    const { error } = await supabase
+        .from('participants')
+        .upsert({ name: nomParticipant, votes: votesParticipant }, { onConflict: 'name' });
 
-    sauvegarderDonnees();
+    if (error) {
+        console.error("Erreur d'enregistrement Supabase:", error);
+        alert("Une erreur est survenue lors de l'enregistrement.");
+    } else {
+        alert(`Merci ${nomParticipant}, vos choix ont été synchronisés en temps réel !`);
+    }
     
     document.getElementById("participant-name").value = "";
     checkboxes.forEach(cb => cb.checked = false);
-    document.getElementById("vote-options-block").classList.remove("visible");
+    
+    const optionsBlock = document.getElementById("vote-options-block");
+    if (optionsBlock) optionsBlock.classList.remove("visible");
     
     réinitialiserBoutonCharger();
-    renderApp();
+    chargerDonnees();
 });
 
+// Initialisation générale au démarrage de l'application
 function initApp() {
     chargerDonnees();
-    renderApp();
+    brancherTempsReel();
     réinitialiserBoutonCharger();
 }
 
