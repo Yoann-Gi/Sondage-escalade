@@ -6,7 +6,7 @@
     <title>Encadrement des séances enfants</title>
     <link rel="stylesheet" href="style.css">
     
-    <!-- Votre lien exact UNPKG validé -->
+    <!-- Votre script local Supabase autonome -->
     <script src="supabase.js"></script>
 </head>
 <body>
@@ -20,15 +20,22 @@
         <section class="vote-section">
             <h2>1. Saisissez votre nom ou choisissez-le dans la liste</h2>
             <form id="vote-form">
-                <div class="form-group inline-form">
+                <div class="form-group main-input-group">
                     <div class="input-container">
                         <label for="participant-name">Votre nom / pseudo :</label>
-                        <input type="text" id="participant-name" list="participants-list" required placeholder="Ex: Jean, Marie...">
-                        <datalist id="participants-list">
-                            <!-- Rempli dynamiquement par app.js -->
-                        </datalist>
+                        <!-- Remplacement de d'un datalist par un vrai menu SELECT pour avoir la flèche native -->
+                        <div class="select-wrapper">
+                            <select id="participant-name" required>
+                                <option value="" disabled selected hidden>Choisissez ou saisissez un nom...</option>
+                                <!-- Rempli dynamiquement par app.js -->
+                            </select>
+                            <input type="text" id="participant-name-text" placeholder="Ou tapez un nouveau nom ici...">
+                        </div>
                     </div>
-                    <button type="button" id="btn-load" class="btn-secondary">Charger mon profil</button>
+                    <div class="button-vertical-group">
+                        <button type="button" id="btn-load" class="btn-secondary">Charger mon profil</button>
+                        <button type="button" id="btn-delete" class="btn-danger-outline">Supprimer ce profil</button>
+                    </div>
                 </div>
                 
                 <!-- BLOC MASQUÉ PAR DÉFAUT -->
@@ -40,6 +47,7 @@
                 </div>
             </form>
         </section>
+
         <!-- ZONE DE RÉSULTAT -->
         <main class="poll-section">
             <h2>Résumé des participants par séance</h2>
