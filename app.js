@@ -3,9 +3,9 @@
 // ==========================================
 
 const SUPABASE_URL = "https://supabase.co"; 
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzeXdleGVqbWVzZGRvc3BxZnVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc5NjUzNjMsImV4cCI6MjA0MzU0MTM2M30.q43Y9H-A2_fGjC0347_z3_86_z3_86_z3_86_z3_86_z3_86"; // Remettez votre vraie clé ici
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzeXdleGVqbWVzZGRvc3BxZnVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc5NjUzNjMsImV4cCI6MjA0MzU0MTM2M30.q43Y9H-A2_fGjC0347_z3_86_z3_86_z3_86_z3_86_z3_86"; 
 
-// Connexion renommée pour éliminer le problème de majuscule
+// CORRECTION MAJEURE : S majuscule obligatoire pour appeler l'outil officiel
 const maBaseDeDonnees = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const VACANCES_ZONE_A_2026_2027 = [
