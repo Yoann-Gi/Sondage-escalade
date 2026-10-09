@@ -3,7 +3,7 @@
 // ==========================================
 
 const SUPABASE_URL = "https://psywexejmesddospqfuj.supabase.co"; 
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzeXdleGVqbWVzZGRvc3BxZnVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc5NjUzNjMsImV4cCI6MjA0MzU0MTM2M30.q43Y9H-A2_fGjC0347_z3_86_z3_86_z3_86_z3_86_z3_86"; 
+const SUPABASE_ANON_KEY = "sb_publishable_26_kmqsqfFhFNVUn0J229w_C17boQBn"; 
 
 // Appel standardisé pour le script unpkg
 const maBaseDeDonnees = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
