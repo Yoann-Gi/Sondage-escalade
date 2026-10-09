@@ -101,7 +101,13 @@ function renderApp() {
 
     if (!table || !checkboxGroup || !datalist) return;
 
-    datalist.innerHTML = pollData.participants.map(p => `<option value="${p.name}"></option>`).join('');
+        // Remplit le menu déroulant avec les profils existants
+    const selectName = document.getElementById("participant-name");
+    if (selectName) {
+        selectName.innerHTML = '<option value="" disabled selected hidden>Choisissez un profil existant...</option>' + 
+            pollData.participants.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+    }
+
 
     const listeInscritsParProp = {};
     pollData.propositions.forEach(p => listeInscritsParProp[p.id] = []);
