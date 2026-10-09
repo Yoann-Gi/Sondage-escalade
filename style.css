@@ -305,18 +305,26 @@ input[type="text"] {
         width: 100%;
     }
 }
-.select-wrapper {
+.button-vertical-group {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
-select, input[type="text"] {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid var(--border-color);
+.btn-danger-outline {
+    background-color: transparent;
+    color: var(--danger-color);
+    border: 2px solid var(--danger-color);
+    padding: 11px 20px;
+    font-size: 15px;
+    font-weight: bold;
     border-radius: 6px;
-    font-size: 16px;
-    background-color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.btn-danger-outline:hover {
+    background-color: var(--danger-color);
+    color: white;
 }
 .button-vertical-group {
     display: flex;
