@@ -307,11 +307,10 @@ function initApp() {
 }
 
 document.addEventListener("DOMContentLoaded", initApp);
-// NOUVEAU : Fonction pour supprimer un profil de la base de données
+// Fonction de suppression simplifiée pour le champ unique
 async function supprimerVotesUtilisateur() {
-    const selectName = document.getElementById("participant-name").value;
-    const textName = document.getElementById("participant-name-text").value.trim();
-    const nomSaisi = textName || selectName;
+    // Lecture sur le champ unique
+    const nomSaisi = document.getElementById("participant-name").value.trim();
 
     if (!nomSaisi) {
         alert("Veuillez sélectionner ou saisir le nom du profil à supprimer.");
