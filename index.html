@@ -1,0 +1,66 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encadrement des séances enfants</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 id="poll-title">Encadrement des séances enfants</h1>
+            <p id="poll-description">Cochez vos disponibilités pour les séances des vendredis (hors vacances scolaires).</p>
+        </header>
+
+        <!-- ZONE DE VOTE -->
+        <section class="vote-section">
+            <h2>1. Saisissez votre nom ou choisissez-le dans la liste</h2>
+            <form id="vote-form">
+                <div class="form-group inline-form">
+                    <div class="input-container">
+                        <label for="participant-name">Votre nom / pseudo :</label>
+                        <input type="text" id="participant-name" list="participants-list" required placeholder="Ex: Jean, Marie...">
+                        <datalist id="participants-list">
+                            <!-- Rempli dynamiquement par app.js -->
+                        </datalist>
+                    </div>
+                    <button type="button" id="btn-load" class="btn-secondary">Charger mon profil</button>
+                </div>
+                
+                <!-- BLOC MASQUÉ PAR DÉFAUT -->
+                <div id="vote-options-block" class="hidden-votes">
+                    <h2 class="step-title">2. Cochez ou décochez vos choix puis validez</h2>
+                    <!-- Les cases à cocher des propositions seront injectées ici -->
+                    <div id="propositions-checkboxes" class="checkbox-group"></div>
+                    <button type="submit" class="btn-submit">Valider mes choix</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- ZONE DE RÉSULTAT -->
+        <main class="poll-section">
+            <h2>Résumé des participants par séance</h2>
+            <div class="table-responsive">
+                <table id="poll-table">
+                    <!-- Le contenu sera injecté ici par JavaScript -->
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- BOÎTE DE DIALOGUE (MODALE) POUR LES PARTICIPANTS -->
+    <div id="modal-participants" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3 id="modal-title">Liste des participants</h3>
+            <ul id="modal-list">
+                <!-- Rempli dynamiquement par app.js -->
+            </ul>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
