@@ -1,14 +1,12 @@
 // ==========================================
-// PARTIE 1 : CONNEXION ET MODULE SUPABASE
+// PARTIE 1 : CONFIGURATION ET CONNEXION
 // ==========================================
 
-// Votre URL est déjà configurée ici
-const SUPABASE_URL = "https://psywexejmesddospqfuj.supabase.co"; 
-// Collez votre longue clé "anon / public" entre les guillemets ci-dessous :
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzeXdleGVqbWVzZGRvc3BxZnVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1Njg3OTQsImV4cCI6MjEwNzE0NDc5NH0.VjLnMhX0kbAnx1F0Rdy6bzMKJjLQBS5FWTwSuZIy81M";
+const SUPABASE_URL = "https://supabase.co"; 
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzeXdleGVqbWVzZGRvc3BxZnVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc5NjUzNjMsImV4cCI6MjA0MzU0MTM2M30.q43Y9H-A2_fGjC0347_z3_86_z3_86_z3_86_z3_86_z3_86"; // Remettez votre vraie clé ici
 
-// Initialisation officielle du client Supabase
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Connexion renommée pour éliminer le problème de majuscule
+const maBaseDeDonnees = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const VACANCES_ZONE_A_2026_2027 = [
     { debut: new Date('2026-10-24'), fin: new Date('2026-11-09') }, // Toussaint
@@ -26,9 +24,6 @@ let pollData = {
     propositions: [], 
     participants: []  
 };
-// ==========================================
-// PARTIE 2 : GÉNÉRATEUR ET SYNCHRONISATION
-// ==========================================
 
 function genererPropositions() {
     const propositions = [];
@@ -61,12 +56,15 @@ function genererPropositions() {
     }
     return propositions;
 }
+// ==========================================
+// PARTIE 2 : SYNC ET RENDU DE L'INTERFACE
+// ==========================================
 
-// Charger les données depuis Supabase à l'ouverture
 async function chargerDonnees() {
     pollData.propositions = genererPropositions();
     
-    const { data, error } = await supabase
+    // Utilisation du nouveau nom de variable maBaseDeDonnees
+    const { data, error } = await maBaseDeDonnees
         .from('participants')
         .select('name, votes');
 
@@ -78,9 +76,8 @@ async function chargerDonnees() {
     renderApp();
 }
 
-// Écouter les changements en temps réel (Julie voit le vote de Thomas en direct)
 function brancherTempsReel() {
-    supabase
+    maBaseDeDonnees
         .channel('schema-db-changes')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'participants' }, () => {
             chargerDonnees();
@@ -96,9 +93,6 @@ function réinitialiserBoutonCharger() {
         btnLoad.style.cursor = "pointer";
     }
 }
-// ==========================================
-// PARTIE 3 : LOGIQUE DE RENDU GRAPHIQUE
-// ==========================================
 
 function renderApp() {
     const table = document.getElementById("poll-table");
@@ -107,10 +101,8 @@ function renderApp() {
 
     if (!table || !checkboxGroup || !datalist) return;
 
-    // Remplir le volet déroulant automatique des profils existants
     datalist.innerHTML = pollData.participants.map(p => `<option value="${p.name}"></option>`).join('');
 
-    // Compter et regrouper les prénoms par créneau
     const listeInscritsParProp = {};
     pollData.propositions.forEach(p => listeInscritsParProp[p.id] = []);
     
@@ -122,7 +114,6 @@ function renderApp() {
         }
     });
 
-    // --- Dessiner le Tableau des Résultats ---
     let tableHTML = `
         <thead>
             <tr>
@@ -162,7 +153,6 @@ function renderApp() {
     tableHTML += `</tbody>`;
     table.innerHTML = tableHTML;
 
-    // Activer l'affichage de la liste des prénoms au clic sur un badge
     document.querySelectorAll('.badge').forEach(badge => {
         badge.addEventListener('click', function() {
             const propId = this.getAttribute('data-id');
@@ -173,7 +163,6 @@ function renderApp() {
         });
     });
 
-    // --- Dessiner le Formulaire de Vote (cases à cocher) ---
     let formHTML = `<p class="info-loi">Sélectionnez vos créneaux (Déroulez la liste) :</p>
                     <div class="select-scroll-container">`;
     
@@ -216,7 +205,7 @@ window.addEventListener("click", (e) => {
     }
 });
 // ==========================================
-// PARTIE 4 : ACTIONS FORMULAIRE ET CORPS GLOBAL
+// PARTIE 3 : SOUMISSION ET ENREGISTREMENT
 // ==========================================
 
 function chargerVotesUtilisateur() {
@@ -246,7 +235,6 @@ function chargerVotesUtilisateur() {
 
     if (optionsBlock) optionsBlock.classList.add("visible");
 
-    // Bloquer le bouton charger en gris
     if (btnLoad) {
         btnLoad.disabled = true;
         btnLoad.style.backgroundColor = "#bdc3c7"; 
@@ -264,7 +252,6 @@ document.getElementById("participant-name").addEventListener("input", function()
     réinitialiserBoutonCharger();
 });
 
-// Envoi et sauvegarde des votes sur les serveurs de Supabase
 document.getElementById("vote-form").addEventListener("submit", async function(e) {
     e.preventDefault();
     const nomParticipant = document.getElementById("participant-name").value.trim();
@@ -282,8 +269,8 @@ document.getElementById("vote-form").addEventListener("submit", async function(e
         votesParticipant[cb.value] = cb.checked;
     });
 
-    // Envoi à Supabase (si le nom existe, il met à jour, sinon il insère une nouvelle ligne)
-    const { error } = await supabase
+    // Sauvegarde en ligne via la variable maBaseDeDonnees
+    const { error } = await maBaseDeDonnees
         .from('participants')
         .upsert({ name: nomParticipant, votes: votesParticipant }, { onConflict: 'name' });
 
@@ -304,10 +291,15 @@ document.getElementById("vote-form").addEventListener("submit", async function(e
     chargerDonnees();
 });
 
-// Initialisation générale au démarrage de l'application
 function initApp() {
-    chargerDonnees();
-    brancherTempsReel();
+    // Remplacer l'ancienne fonction par l'appel à la base de données en ligne
+    const checkSupabase = typeof Supabase !== 'undefined';
+    if (checkSupabase) {
+        chargerDonnees();
+        brancherTempsReel();
+    } else {
+        console.error("Le module Supabase n'est pas détecté. Vérifiez index.html");
+    }
     réinitialiserBoutonCharger();
 }
 
