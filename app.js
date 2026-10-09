@@ -265,7 +265,12 @@ document.getElementById("participant-name").addEventListener("input", function()
 
 document.getElementById("vote-form").addEventListener("submit", async function(e) {
     e.preventDefault();
-    const nomParticipant = document.getElementById("participant-name").value.trim();
+    const selectName = document.getElementById("participant-name").value;
+    const textName = document.getElementById("participant-name-text").value.trim();
+    const nomParticipant = textName || selectName;
+    
+    if (!nomParticipant) return;
+
     if (!nomParticipant) return;
 
     const checkboxes = document.querySelectorAll('input[name="propositions"]');
