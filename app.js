@@ -292,14 +292,8 @@ document.getElementById("vote-form").addEventListener("submit", async function(e
 });
 
 function initApp() {
-    // Remplacer l'ancienne fonction par l'appel à la base de données en ligne
-    const checkSupabase = typeof Supabase !== 'undefined';
-    if (checkSupabase) {
-        chargerDonnees();
-        brancherTempsReel();
-    } else {
-        console.error("Le module Supabase n'est pas détecté. Vérifiez index.html");
-    }
+    chargerDonnees();
+    brancherTempsReel();
     réinitialiserBoutonCharger();
 }
 
