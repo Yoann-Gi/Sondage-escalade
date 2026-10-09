@@ -260,10 +260,8 @@ document.getElementById("participant-name").addEventListener("input", function()
 
 document.getElementById("vote-form").addEventListener("submit", async function(e) {
     e.preventDefault();
-    const selectName = document.getElementById("participant-name").value;
-    const textName = document.getElementById("participant-name-text").value.trim();
-    const nomParticipant = textName || selectName;
-    
+    // Lecture sur le champ unique
+    const nomParticipant = document.getElementById("participant-name").value.trim();
     if (!nomParticipant) return;
 
     if (!nomParticipant) return;
