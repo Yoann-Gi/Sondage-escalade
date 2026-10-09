@@ -44,3 +44,28 @@
                 </div>
             </form>
         </section>
+        <!-- ZONE DE RÉSULTAT -->
+        <main class="poll-section">
+            <h2>Résumé des participants par séance</h2>
+            <div class="table-responsive">
+                <table id="poll-table">
+                    <!-- Le contenu sera injecté ici par JavaScript -->
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- BOÎTE DE DIALOGUE (MODALE) POUR LES PARTICIPANTS -->
+    <div id="modal-participants" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3 id="modal-title">Liste des participants</h3>
+            <ul id="modal-list">
+                <!-- Rempli dynamiquement par app.js -->
+            </ul>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
