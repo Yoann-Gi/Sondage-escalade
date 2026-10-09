@@ -309,6 +309,7 @@ input[type="text"] {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    margin-top: 27px; /* Décale les boutons vers le bas pour l'alignement */
 }
 .btn-danger-outline {
     background-color: transparent;
