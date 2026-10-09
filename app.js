@@ -215,9 +215,14 @@ window.addEventListener("click", (e) => {
 // ==========================================
 
 function chargerVotesUtilisateur() {
-    const nomSaisi = document.getElementById("participant-name").value.trim();
+    const selectName = document.getElementById("participant-name").value;
+    const textName = document.getElementById("participant-name-text").value.trim();
+    
+    // Priorité au nom tapé à la main, sinon on prend le menu déroulant
+    const nomSaisi = textName || selectName;
+
     if (!nomSaisi) {
-        alert("Veuillez d'abord saisir ou sélectionner un nom.");
+        alert("Veuillez d'abord choisir un nom dans la liste ou en taper un nouveau.");
         return;
     }
 
@@ -304,3 +309,47 @@ function initApp() {
 }
 
 document.addEventListener("DOMContentLoaded", initApp);
+// NOUVEAU : Fonction pour supprimer un profil de la base de données
+async function supprimerVotesUtilisateur() {
+    const selectName = document.getElementById("participant-name").value;
+    const textName = document.getElementById("participant-name-text").value.trim();
+    const nomSaisi = textName || selectName;
+
+    if (!nomSaisi) {
+        alert("Veuillez sélectionner ou saisir le nom du profil à supprimer.");
+        return;
+    }
+
+    const confirmer = confirm(`Êtes-vous sûr de vouloir supprimer définitivement le profil de "${nomSaisi}" et tous ses votes ?`);
+    if (!confirmer) return;
+
+    // Suppression dans Supabase
+    const { error } = await maBaseDeDonnees
+        .from('participants')
+        .delete()
+        .eq('name', nomSaisi);
+
+    if (error) {
+        console.error("Erreur de suppression Supabase:", error);
+        alert("Impossible de supprimer le profil.");
+    } else {
+        alert(`Le profil de "${nomSaisi}" a été supprimé avec succès.`);
+        
+        // Réinitialisation des champs du formulaire
+        document.getElementById("participant-name").value = "";
+        document.getElementById("participant-name-text").value = "";
+        const optionsBlock = document.getElementById("vote-options-block");
+        if (optionsBlock) optionsBlock.classList.remove("visible");
+        
+        réinitialiserBoutonCharger();
+        chargerDonnees(); // Recharge le tableau propre
+    }
+}
+
+// Liaison de l'action au clic sur le bouton Supprimer
+document.getElementById("btn-delete").addEventListener("click", supprimerVotesUtilisateur);
+
+// Si l'utilisateur change de sélection dans le menu, on réactive les boutons
+document.getElementById("participant-name").addEventListener("change", function() {
+    réinitialiserBoutonCharger();
+});
